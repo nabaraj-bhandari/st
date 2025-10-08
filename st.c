@@ -2802,15 +2802,14 @@ draw(void)
 	LIMIT(term.ocx, 0, term.col-1);
 	LIMIT(term.ocy, 0, term.row-1);
 	if (TLINE(term.ocy)[term.ocx].mode & ATTR_WDUMMY)
-      term.ocx--;
+		term.ocx--;
 	if (TLINE(term.c.y)[cx].mode & ATTR_WDUMMY)
-      cx--;
- 
- 	drawregion(0, 0, term.col, term.row);
+		cx--;
+
+	drawregion(0, 0, term.col, term.row);
 	if (TSCREEN.off == 0)
 		xdrawcursor(cx, term.c.y, TLINE(term.c.y)[cx],
-          term.ocx, term.ocy, TLINE(term.ocy)[term.ocx],
-          TLINE(term.ocy), term.col);
+				term.ocx, term.ocy, TLINE(term.ocy)[term.ocx]);
 	term.ocx = cx;
 	term.ocy = term.c.y;
 	xfinishdraw();

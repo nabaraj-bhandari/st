@@ -1,6 +1,21 @@
-static char *font = "JetBrains Mono:size=14:antialias=true:autohint=true";
+/* See LICENSE file for copyright and license details. */
+
+/*
+ * appearance
+ *
+ * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
+ */
+static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
 static int borderpx = 2;
 
+/*
+ * What program is execed by st depends of these precedence rules:
+ * 1: program passed with -e
+ * 2: scroll and/or utmp
+ * 3: SHELL environment variable
+ * 4: value of shell in /etc/passwd
+ * 5: value of shell in config.h
+ */
 static char *shell = "/bin/sh";
 char *utmp = NULL;
 /* scroll program: to enable use a string like "scroll" */
@@ -45,7 +60,7 @@ static double maxlatency = 33;
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
  * attribute.
  */
-static unsigned int blinktimeout = 600;
+static unsigned int blinktimeout = 800;
 
 /*
  * thickness of underline and bar cursors
@@ -61,7 +76,25 @@ static int bellvolume = 0;
 /* default TERM value */
 char *termname = "st-256color";
 
+/*
+ * spaces per tab
+ *
+ * When you are changing this value, don't forget to adapt the »it« value in
+ * the st.info and appropriately install the st.info in the environment where
+ * you use this st version.
+ *
+ *	it#$tabspaces,
+ *
+ * Secondly make sure your kernel is not expanding tabs. When running `stty
+ * -a` »tab0« should appear. You can tell the terminal to not expand tabs by
+ *  running following command:
+ *
+ *	stty tabs
+ */
 unsigned int tabspaces = 8;
+
+/* bg opacity */
+float alpha = 0.8;
 
 /*
  * drag and drop escape characters
@@ -70,43 +103,46 @@ unsigned int tabspaces = 8;
  */
 char *xdndescchar = " !\"#$&'()*;<>?[\\]^`{|}~";
 
-/* bg opacity */
-float alpha = 0.7;
-
 /* Terminal colors (16 first used in escape sequence) */
-const char *colorname[] = {
-    /* 8 normal colors */
-    [0] = "#050909", /* black   */
-    [1] = "#0E3A46", /* red     */
-    [2] = "#074B51", /* green   */
-    [3] = "#125E67", /* yellow  */
-    [4] = "#5C5D5A", /* blue    */
-    [5] = "#898677", /* magenta */
-    [6] = "#0F748B", /* cyan    */
-    [7] = "#7ac3c8", /* white   */
+static const char *colorname[] = {
+	/* 8 normal colors */
+	"black",
+	"red3",
+	"green3",
+	"yellow3",
+	"blue2",
+	"magenta3",
+	"cyan3",
+	"gray90",
 
-    /* 8 bright colors */
-    [8] = "#55888c",  /* black   */
-    [9] = "#0E3A46",  /* red     */
-    [10] = "#074B51", /* green   */
-    [11] = "#125E67", /* yellow  */
-    [12] = "#5C5D5A", /* blue    */
-    [13] = "#898677", /* magenta */
-    [14] = "#0F748B", /* cyan    */
-    [15] = "#7ac3c8", /* white   */
+	/* 8 bright colors */
+	"gray50",
+	"red",
+	"green",
+	"yellow",
+	"#5c5cff",
+	"magenta",
+	"cyan",
+	"white",
 
-    /* special colors */
-    [256] = "#050909", /* background */
-    [257] = "#7ac3c8", /* foreground */
-    [258] = "#7ac3c8", /* cursor */
+	[255] = 0,
+
+	/* more colors can be added after 255 to use with DefaultXX */
+	"#cccccc",
+	"#555555",
+	"gray90", /* default foreground colour */
+	"black", /* default background colour */
 };
 
-/* Default colors (colorname index)
- * foreground, background, cursor */
-unsigned int defaultbg = 0;
-unsigned int defaultfg = 257;
-unsigned int defaultcs = 258;
-unsigned int defaultrcs = 258;
+
+/*
+ * Default colors (colorname index)
+ * foreground, background, cursor, reverse cursor
+ */
+unsigned int defaultfg = 258;
+unsigned int defaultbg = 259;
+unsigned int defaultcs = 256;
+static unsigned int defaultrcs = 257;
 
 /*
  * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
@@ -121,7 +157,7 @@ unsigned int defaultrcs = 258;
  * 7: blinking st cursor
  * 8: steady st cursor
  */
-static unsigned int cursorstyle = 3;
+static unsigned int cursorstyle = 1;
 static Rune stcursor = 0x2603; /* snowman ("☃") */
 
 /*
@@ -176,8 +212,8 @@ static Shortcut shortcuts[] = {
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-  { ControlMask,          XK_equal,      zoom,           {.f = +1} },
-  { ControlMask,          XK_minus,       zoom,           {.f = -1} },
+	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
+	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
